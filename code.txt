@@ -6,7 +6,7 @@ JOIN countries c ON l.country_id = c.country_id;
 ##Question_2
 SELECT e.first_name, e.last_name, e.department_id, d.department_name
 FROM employees e
-JOIN departments d ON e.department_id = d.department_id;
+JOIN departments d ON e.department_id = d.department_id; 
 ##Question_3
 SELECT e.first_name, e.last_name, e.job_id, e.department_id, d.department_name
 FROM employees e
@@ -28,11 +28,14 @@ FROM departments d
 LEFT JOIN employees e ON d.department_id = e.department_id
 GROUP BY d.department_name;
 ##Question_7
-SELECT d.department_name, e.first_name, e.last_name, e.hire_date, e.salary
-FROM employees e
-JOIN departments d ON e.department_id = d.department_id
-WHERE e.manager_id IS NULL
-AND DATEDIFF(CURDATE(), e.hire_date) / 365 > 15;
+SELECT d.department_name,e.first_name,e.last_name,e.hire_date,e.salary
+FROM
+ employees e
+JOIN
+ departments d ON e.department_id = d.department_id
+WHERE
+ e.employee_id IN (SELECT DISTINCT manager_id FROM employees)
+ AND DATEDIFF(CURDATE(), e.hire_date) > 15 * 365;
 ##Question_8
 SELECT e.first_name, e.last_name, e.salary
 FROM employees e
@@ -66,15 +69,23 @@ JOIN departments d ON e.department_id = d.department_id
 WHERE e.salary > (SELECT AVG(salary) FROM employees)
 AND d.department_name LIKE '%IT%';
 ##Question_14
-SELECT e.first_name, e.last_name, e.salary
-FROM employees e
-JOIN departments d ON e.department_id = d.department_id
-WHERE e.salary = (SELECT MIN(salary) FROM employees);
+SELECT
+ e.first_name,
+ e.last_name,
+ e.salary,e.department_id
+FROM
+ employees e
+JOIN
+ (SELECT department_id, MIN(salary) AS min_salary FROM employees GROUP BY 
+department_id) m
+ON e.department_id = m.department_id AND e.salary = m.min_salary;
 ##Question_15
 SELECT e.first_name, e.last_name, e.salary
 FROM employees e
 WHERE e.salary > (SELECT MAX(salary) FROM employees WHERE job_id = 'SH_CLERK')
 ORDER BY e.salary ASC;
+ 
+ 
 
 
 
